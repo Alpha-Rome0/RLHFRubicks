@@ -37,8 +37,7 @@ def get_prompt(scramble):
 
     Now you should generate the correct next move for the following scramble (note: your answer should only contain a single move and nothing more).
     Scramble:{scramble}
-    Next move:
-    """
+    Next move:"""
 
 def load_data(data_path, num_predicted_turns=1):
     with open(data_path, 'r') as data:
@@ -66,6 +65,6 @@ class RubiksDataset(Dataset):
 
     def __getitem__(self, idx):
         item = self.data[idx]
-        query_encoding = self.tokenizer(get_prompt(item['query']), return_tensors='pt', padding='max_length', truncation=True, max_length=550)
+        query_encoding = self.tokenizer(get_prompt(item['query']), return_tensors='pt', padding='max_length', max_length=550)
         # response_encoding = self.tokenizer(item['response'], return_tensors='pt', padding='max_length', truncation=True, max_length=1024)
         return query_encoding['input_ids'].to(device), item['output']

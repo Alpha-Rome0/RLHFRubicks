@@ -18,9 +18,10 @@ GEMMA_MODEL_ID = 'google/gemma-2b-it'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 # input arguments here
-data_path = 'phi2-ppo/datasets/Kociemba_solutions.csv'
+data_path = 'gemma-ppo/datasets/Kociemba_solutions.csv'
 lr = 1e-4
-batch_size = 2
+batch_size = 1
+epochs = 1
 
 
 data = load_data(data_path)
@@ -31,7 +32,7 @@ tokenizer.pad_token = tokenizer.bos_token
 
 # Load the model with 4bit quauntization
 bnb_config = BitsAndBytesConfig(
-        bnb_4bit_compute_dtype='bfloat16',
+        bnb_4bit_compute_dtype=torch.bfloat16,
         bnb_4bit_quant_type='nf4',
         bnb_4bit_use_double_quant=True,
         load_in_4bit=True
@@ -43,7 +44,7 @@ bnb_config = BitsAndBytesConfig(
 # )
 model = AutoModelForCausalLMWithValueHead.from_pretrained(
     GEMMA_MODEL_ID, 
-    quantization_config=bnb_config,
+    # quantization_config=bnb_config,
     trust_remote_code=True
 ).to(device)
 
@@ -76,7 +77,6 @@ ppo_trainer = PPOTrainer(
     tokenizer=tokenizer,
 )
 
-epochs = 10
 for epoch in tqdm(range(epochs), "epoch: "):
     for query_tensors, correct_answers in tqdm(dataloader): 
         query_tensors = query_tensors.squeeze(1)
