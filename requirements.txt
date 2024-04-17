@@ -1,2 +1,11 @@
 rubik-solver
 pycubescrambler
+torch
+tqdm
+transformers
+trl
+peft
+bitsandbytes
+pycubescrambler
+rubik_solver
+matplotlib

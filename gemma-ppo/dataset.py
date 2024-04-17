@@ -9,7 +9,7 @@ def get_prompt(scramble):
 
     return f"""You are a Rubik's cube solving assistant. Your job is to generate the next best move when solving a Rubik's cube when given the a Rubik's cube scramble. A scramble is a list of moves that are performed on a fully solved Rubik's cube in order to scramble it up. When replying, you must only reply with a single move.
 
-    Below are the possible moves:
+    Below are the only valid next moves:
     U (Up): Rotate the upper face 90 degrees clockwise.
     U' (Up Prime): Rotate the upper face 90 degrees counter-clockwise.
     U2 (Up twice): Rotate the upper face 180 degrees.
@@ -38,7 +38,7 @@ def get_prompt(scramble):
     Scramble: {scramble}
     Next move: """
 
-def load_data(data_path, num_predicted_turns=1):
+def load_data(data_path, num_predicted_turns=10000):
     with open(data_path, 'r') as data:
         # Using the csv library to read the data
         reader = csv.DictReader(data)
@@ -66,4 +66,4 @@ class RubiksDataset(Dataset):
         item = self.data[idx]
         query_encoding = self.tokenizer(get_prompt(item['query']), return_tensors='pt', padding='max_length', max_length=550)
         # response_encoding = self.tokenizer(item['response'], return_tensors='pt', padding='max_length', truncation=True, max_length=1024)
-        return query_encoding['input_ids'].to(device), item['output']
+        return query_encoding['input_ids'].to(device), item['query'], item['output']
