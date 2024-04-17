@@ -21,7 +21,7 @@ moves that are performed on a fully solved Rubik's cube in order to scramble it 
 you must only reply with a single move.
 
 Below I describe the possible moves:
-(Up): Rotate the upper face 90 degrees clockwise.
+U (Up): Rotate the upper face 90 degrees clockwise.
 U' (Up Prime): Rotate the upper face 90 degrees counter-clockwise.
 U2: Rotate the upper face 180 degrees.
 D (Down): Rotate the bottom face 90 degrees clockwise.

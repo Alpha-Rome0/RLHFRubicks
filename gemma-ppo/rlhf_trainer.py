@@ -16,9 +16,10 @@ GEMMA_MODEL_ID = 'google/gemma-2b-it'
 
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+print(device)
 
 # input arguments here
-data_path = 'gemma-ppo/datasets/Kociemba_solutions.csv'
+data_path = 'datasets/Kociemba_solutions.csv'
 lr = 1e-4
 batch_size = 1
 epochs = 1
@@ -44,7 +45,7 @@ bnb_config = BitsAndBytesConfig(
 # )
 model = AutoModelForCausalLMWithValueHead.from_pretrained(
     GEMMA_MODEL_ID, 
-    # quantization_config=bnb_config,
+    quantization_config=bnb_config,
     trust_remote_code=True
 ).to(device)
 
@@ -88,7 +89,7 @@ for epoch in tqdm(range(epochs), "epoch: "):
         #### Compute reward score
         rewards = [torch.tensor(reward_model_strict(correct_answer, response), dtype=torch.float16) for correct_answer, response in zip(correct_answers, responses)]
     
-        #### Run PPO step
+        #### Run PPO stepda
         stats = ppo_trainer.step(query_tensors, response_tensors, rewards)
         
         #TODO: log stats
