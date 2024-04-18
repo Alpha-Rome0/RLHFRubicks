@@ -84,7 +84,7 @@ for epoch in tqdm(range(epochs), "epoch: "):
         query_tensors = query_tensors.squeeze(1)
         query_tensors = list(torch.unbind(query_tensors, dim=0))
         #### Get response from model
-        response_tensors = [ppo_trainer.generate(query_tensor, max_length=570).squeeze(0) for query_tensor in query_tensors]
+        response_tensors = [ppo_trainer.generate(query_tensor, max_length=600).squeeze(0) for query_tensor in query_tensors]
         responses = [tokenizer.decode(r.squeeze()) for r in response_tensors]
         cube = Cube()
         for move in query[0].split(' '):

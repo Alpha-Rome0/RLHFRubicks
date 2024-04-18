@@ -29,14 +29,14 @@ def find_second_next_move(s):
         int: The index of the second instance of "Next move", or -1 if not found.
     """
     # Find the first instance of "Next move"
-    first_index = s.find("Next move:")
+    first_index = s.find("Next moves:")
     
     if first_index == -1:
         # "Next move" not found
         return -1
     
     # Find the second instance of "Next move"
-    second_index = s.find("Next move:", first_index + 1)
+    second_index = s.find("Next moves:", first_index + 1)
     
     return second_index + 10
 
@@ -48,20 +48,21 @@ def reward_model_basic(correct_output, model_output):
 
 def reward_model_distance(cube, optimalSolution, model_output, solver):
     model_response = model_output[find_second_next_move(model_output):].strip()
-    pattern = re.compile("([UDFBLR][2']?\s*)+")
-    print("model_reponse:", model_response)
-    matched_sequences = re.findall(pattern, model_response)
-    print(matched_sequences)
+    pattern_full = re.compile("^([UDFBLR][2']?\s*)+$")
+    pattern_moves = re.compile("[UDFBLR][2']?")
+    matched_sequences = re.findall(pattern_moves, model_response)
+    print("model response:", model_response)
+    print("matched_sequences:", matched_sequences)
     #Penalize by -10 for invalid output
-    if len(matched_sequences) == 0 or not bool(pattern.fullmatch(matched_sequences[0])):
-        return -10
+    if len(matched_sequences) == 0:# or not bool(re.fullmatch(pattern_full, model_response)):
+        return -100
 
     #Get default output when applying solver to cube that is already solved
-    solvedSolution = utils.solve("yyyyyyyyybbbbbbbbbrrrrrrrrrgggggggggooooooooowwwwwwwww", 'Kociemba')
+    solvedSolution = utils.solve("yyyyyyyyybbbbbbbbbrrrrrrrrrgggggggggooooooooowwwwwwwww", solver)
     solvedSolution = np.array(solvedSolution)
     #Apply move to cube
-    print("move:", matched_sequences[0])
-    for move in matched_sequences[0]:
+    print("moves:", matched_sequences)
+    for move in matched_sequences[:5]:
         cube.move(Move(move))
     naive = cube.to_naive_cube()
     cubestr = naive.get_cube()

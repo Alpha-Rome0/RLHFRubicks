@@ -32,11 +32,11 @@ def get_prompt(scramble):
     Here is an example scramble and correct response.
 
     Scramble: F2 B' U2 D' R2 L' U' B2 U2 B U' L2 U2 L U2 R B2 F2 R2 D
-    Next move: R
+    Next moves: R D' L' U2 L2 B R' D' B R' F D2 B2 R2 U' F2 U' R2 L2 F2 B2
 
-    Now you should generate the correct next move for the following scramble (note: your answer should only contain a single move and nothing more).
+    Now you should generate the correct next moves for the following scramble.
     Scramble: {scramble}
-    Next move: """
+    Next moves: """
 
 def load_data(data_path, num_predicted_turns=10000):
     with open(data_path, 'r') as data:

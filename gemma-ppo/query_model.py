@@ -15,8 +15,8 @@ model = AutoModelForCausalLMWithValueHead.from_pretrained("google/gemma-2b-it", 
 tokenizer = AutoTokenizer.from_pretrained("google/gemma-2b-it", trust_remote_code=True)
 
 prompt = """
-You are a Rubik's cube solving assistant. Your job is to generate the next best move 
-when solving a Rubik's cube when given the a Rubik's cube scramble. A scramble is a list of 
+You are a Rubik's cube solving assistant. Your job is to generate the next best move
+when solving a Rubik's cube when given the a Rubik's cube scramble. A scramble is a list of
 moves that are performed on a fully solved Rubik's cube in order to scramble it up. When replying,
 you must only reply with a single move.
 
@@ -43,9 +43,9 @@ R2: Rotate the right face 180 degrees.
 Here is an example scramble and correct response.
 
 Scramble: F2 B' U2 D' R2 L' U' B2 U2 B U' L2 U2 L U2 R B2 F2 R2 D
-Response: R
+Response: R D' L' U2 L2
 
-Now you should generate the correct response for the following scramble (note: your answer should only contain a single move).
+Now you should generate the correct response for the following scramble (note: your answer should only contain five moves).
 Scramble: D2 B2 R' D' R2 B' U2 L2 F' D2 L2 U2 B2 L U' B2 F U2 D' R'
 Response:
 """

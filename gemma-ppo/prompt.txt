@@ -26,8 +26,8 @@ R2: Rotate the right face 180 degrees.
 Here is an example scramble and correct response.
 
 Scramble: F2 B' U2 D' R2 L' U' B2 U2 B U' L2 U2 L U2 R B2 F2 R2 D
-Response: R
+Response: R D' L' U2 L2
 
-Now you should generate the correct response for the following scramble (note: your answer should only contain a single move).
+Now you should generate the correct response for the following scramble (note: your answer should only contain five moves).
 Scramble: D2 B2 R' D' R2 B' U2 L2 F' D2 L2 U2 B2 L U' B2 F U2 D' R'
 Response:
