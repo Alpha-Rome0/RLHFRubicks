@@ -29,7 +29,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 # login()
 
-device = "cuda:0"
+device = "cuda:1"
 
 LR = 1.41e-5
 BATCH_SIZE = 1
@@ -99,4 +99,4 @@ for epoch in tqdm(range(epochs), "epoch: "):
         # ppo_trainer.log_stats(stats, batch, rewards)
 
 #### Save model
-ppo_trainer.save_model(f"gemma-2b-it-rlhf-kociemba")
+ppo_trainer.save_pretrained("my_ppo_model")

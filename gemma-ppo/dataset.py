@@ -7,7 +7,7 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 print(device)
 def get_prompt(scramble):
 
-    return f"""You are a Rubik's cube solving assistant. Your job is to generate the next best move when solving a Rubik's cube when given the a Rubik's cube scramble. A scramble is a list of moves that are performed on a fully solved Rubik's cube in order to scramble it up. When replying, you must only reply with a single move.
+    return f"""You are a Rubik's cube solving assistant. Your job is to generate the moves needed to solve a Rubik's cube when given the Rubik's cube scramble. A scramble is a list of moves that are performed on a fully solved Rubik's cube in order to scramble it up.
 
     Below are the only valid next moves:
     U (Up): Rotate the upper face 90 degrees clockwise.
@@ -34,7 +34,7 @@ def get_prompt(scramble):
     Scramble: F2 B' U2 D' R2 L' U' B2 U2 B U' L2 U2 L U2 R B2 F2 R2 D
     Next moves: R D' L' U2 L2 B R' D' B R' F D2 B2 R2 U' F2 U' R2 L2 F2 B2
 
-    Now you should generate the correct next moves for the following scramble.
+    Now you should generate the correct next moves to solve the rubiks cube following the scramble.
     Scramble: {scramble}
     Next moves: """
 

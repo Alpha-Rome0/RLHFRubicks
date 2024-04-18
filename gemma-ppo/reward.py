@@ -46,13 +46,43 @@ def reward_model_basic(correct_output, model_output):
         return 1
     return 0
 
+def reward_function(model_output, optimalSolution):
+    optimal_moves = optimalSolution.split(" ")
+    model_response = model_output[find_second_next_move(model_output):].strip()
+    with open("output.txt", "a+") as file:
+        file.write(f"model response: {model_response}\n")
+    pattern_full = re.compile("^([UDFBLR][2']?\s*)+$")
+    pattern_moves = re.compile("[UDFBLR][2']?")
+    actual_moves = re.findall(pattern_moves, model_response)
+    with open("output.txt", "a+") as file:
+        file.write(f"actual_moves: {actual_moves}\n")
+    with open("output.txt", "a+") as file:
+        file.write(f"optimal_moves: {optimal_moves}\n")
+    if len(actual_moves) == 0:# or not bool(re.fullmatch(pattern_full, model_response)):
+        return -100
+    reward = 0
+    # Iterate over the minimum length of both lists to avoid index errors
+    for actual, optimal in zip(actual_moves, optimal_moves):
+        if actual == optimal:
+            reward += 1
+        else:
+            break  # Stop counting at the first mismatch
+    reward *= 10
+    with open("output.txt", "a+") as file:
+        file.write(f"reward: {reward}\n")
+    return reward
+
 def reward_model_distance(cube, optimalSolution, model_output, solver):
+    numMovesToConsider = 5
+
     model_response = model_output[find_second_next_move(model_output):].strip()
     pattern_full = re.compile("^([UDFBLR][2']?\s*)+$")
     pattern_moves = re.compile("[UDFBLR][2']?")
     matched_sequences = re.findall(pattern_moves, model_response)
-    print("model response:", model_response)
-    print("matched_sequences:", matched_sequences)
+    with open("output.txt", "a+") as file:
+        file.write(f"model response: {model_response}\n")
+    with open("output.txt", "a+") as file:
+        file.write(f"matched_sequences: {matched_sequences}\n")
     #Penalize by -10 for invalid output
     if len(matched_sequences) == 0:# or not bool(re.fullmatch(pattern_full, model_response)):
         return -100
@@ -61,8 +91,9 @@ def reward_model_distance(cube, optimalSolution, model_output, solver):
     solvedSolution = utils.solve("yyyyyyyyybbbbbbbbbrrrrrrrrrgggggggggooooooooowwwwwwwww", solver)
     solvedSolution = np.array(solvedSolution)
     #Apply move to cube
-    print("moves:", matched_sequences)
-    for move in matched_sequences[:5]:
+    with open("output.txt", "a+") as file:
+        file.write(f"moves: {matched_sequences[:numMovesToConsider]}\n")
+    for move in matched_sequences[:numMovesToConsider]:
         cube.move(Move(move))
     naive = cube.to_naive_cube()
     cubestr = naive.get_cube()
@@ -76,9 +107,13 @@ def reward_model_distance(cube, optimalSolution, model_output, solver):
     if np.array_equal(optimalSolution, solvedSolution):
         optimalSolution = []
     reward = len(optimalSolution) - len(newSln)
-    print(optimalSolution, len(optimalSolution))
-    print(newSln, len(newSln))
-    print(reward)
+    reward *= 10
+    with open("output.txt", "a+") as file:
+        file.write(f"optimalSolution: {optimalSolution} {len(optimalSolution)}\n")
+    with open("output.txt", "a+") as file:    
+        file.write(f"newSln: {newSln} {len(newSln)}\n")
+    with open("output.txt", "a+") as file:    
+        file.write(f"reward: {reward}\n")
     return reward
 
 def reward_model_strict(correct_output, model_output):
