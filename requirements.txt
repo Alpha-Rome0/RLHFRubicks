@@ -1,2 +1,7 @@
 rubik-solver
 pycubescrambler
+torch
+peft
+transformers
+trl
+huggingface_hub

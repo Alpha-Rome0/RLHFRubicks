@@ -1,10 +1,12 @@
 ---
 license: apache-2.0
+library_name: peft
 tags:
 - trl
 - ppo
 - transformers
 - reinforcement-learning
+base_model: google/gemma-2b-it
 ---
 
 # TRL Model
@@ -41,3 +43,6 @@ model = AutoModelForCausalLMWithValueHead.from_pretrained("Alpha-Romeo/gemma-2b-
 inputs = tokenizer("Hello, my llama is cute", return_tensors="pt")
 outputs = model(**inputs, labels=inputs["input_ids"])
 ```
+### Framework versions
+
+- PEFT 0.10.0

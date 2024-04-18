@@ -41,3 +41,20 @@ def reward_model_strict(correct_output, model_output):
         return 1
     return -1
     
+def reward_R(correct_output, model_output):
+    model_response = model_output[find_second_next_move(model_output):]
+    print(model_response)
+    if 'R' in model_response:
+        print('1')
+        return 100    
+    print('-1')
+    return -1
+
+def reward_U(correct_output, model_output):
+    model_response = model_output[find_second_next_move(model_output):]
+    print(model_response)
+    if 'U' in model_response:
+        print('1')
+        return 1
+    print('-1')
+    return -1
