@@ -4,7 +4,7 @@ import torch
 from trl import AutoModelForCausalLMWithValueHead
 # login()
 
-torch.set_default_device("cuda")
+torch.set_default_device("cuda:1")
 
 # phi-2
 # model = AutoModelForCausalLM.from_pretrained("microsoft/phi-2", torch_dtype="auto", trust_remote_code=True)
@@ -49,7 +49,7 @@ Now you should generate the correct response for the following scramble (note: y
 Scramble: D2 B2 R' D' R2 B' U2 L2 F' D2 L2 U2 B2 L U' B2 F U2 D' R'
 Response:
 """
-inputs = tokenizer(prompt, return_tensors="pt", return_attention_mask=False).to('cuda')
+inputs = tokenizer(prompt, return_tensors="pt", return_attention_mask=False).to('cuda:1')
 
 outputs = model.generate(**inputs, max_length=5000, pad_token_id=tokenizer.eos_token_id)
 

@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 from peft import LoraConfig, prepare_model_for_kbit_training
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from trl import PPOTrainer, PPOConfig, AutoModelForCausalLMWithValueHead
-from reward import reward_model_basic, reward_model_strict, reward_model_distance
+from reward import reward_model_basic, reward_model_strict, reward_model_distance, reward_function
 from dataset import load_data, RubiksDataset
 from huggingface_hub import login
 import bitsandbytes as bnb
@@ -38,7 +38,7 @@ MINI_BATCH_SIZE = 1
 bnb_config = BitsAndBytesConfig(
     load_in_4bit=True,
     #bnb_4bit_quant_type="nf4",
-    #bnb_4bit_compute_dtype=torch.float16
+    bnb_4bit_compute_dtype=torch.float16
 )
 
 model_id = "google/gemma-2b-it"
@@ -60,8 +60,9 @@ lora_config = LoraConfig(
 tokenizer = AutoTokenizer.from_pretrained(config.model_name)
 tokenizer.pad_token = tokenizer.eos_token
 
-model = AutoModelForCausalLMWithValueHead.from_pretrained(config.model_name, quantization_config=bnb_config, peft_config=lora_config, device_map="auto")
-#model = AutoModelForCausalLMWithValueHead.from_pretrained(config.model_name,  device_map="auto", token=os.environ['HF_TOKEN'])
+model = AutoModelForCausalLMWithValueHead.from_pretrained(config.model_name, quantization_config=bnb_config, peft_config=lora_config, torch_dtype=torch.bfloat16, device_map=device)
+# model = AutoModelForCausalLMWithValueHead.from_pretrained(config.model_name,  device_map="auto", token=os.environ['HF_TOKEN'])
+# model = AutoModelForCausalLM.from_pretrained("google/gemma-7b-it", device_map="cuda:1", torch_dtype=torch.bfloat16)
 
 optimizer = bnb.optim.Adam8bit(model.parameters(), lr=LR)
 
@@ -77,20 +78,20 @@ ppo_trainer = PPOTrainer(
     optimizer= optimizer
 )
 
-epochs = 1
+epochs = 4
 
 for epoch in tqdm(range(epochs), "epoch: "):
     for query_tensors, query, correct_answers in tqdm(dataloader): 
-        query_tensors = query_tensors.squeeze(1)
+        query_tensors = query_tensors.squeeze(1).to(device)
         query_tensors = list(torch.unbind(query_tensors, dim=0))
         #### Get response from model
         response_tensors = [ppo_trainer.generate(query_tensor, max_length=600).squeeze(0) for query_tensor in query_tensors]
         responses = [tokenizer.decode(r.squeeze()) for r in response_tensors]
-        cube = Cube()
-        for move in query[0].split(' '):
-            cube.move(Move(move))
+        # cube = Cube()
+        # for move in query[0].split(' '):
+        #     cube.move(Move(move))
         #### Compute reward score
-        rewards = [torch.tensor(reward_model_distance(cube, correct_answer, response, 'Kociemba'), dtype=torch.float16) for correct_answer, response in zip(correct_answers, responses)]
+        rewards = [torch.tensor(reward_function(response, correct_answer), dtype=torch.float16) for correct_answer, response in zip(correct_answers, responses)]
     
         #### Run PPO stepda
         stats = ppo_trainer.step(query_tensors, response_tensors, rewards)
@@ -99,4 +100,4 @@ for epoch in tqdm(range(epochs), "epoch: "):
         # ppo_trainer.log_stats(stats, batch, rewards)
 
 #### Save model
-ppo_trainer.save_model(f"gemma-2b-it-rlhf-kociemba")
+ppo_trainer.save_pretrained("my_ppo_model_bfloat16")
