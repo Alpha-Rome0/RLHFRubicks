@@ -40,6 +40,31 @@ def find_second_next_move(s):
     
     return second_index + 10
 
+def filter_valid_moves(raw_moves):
+    # Define a set of valid moves
+    valid_moves = {"U", "U'", "U2", "F", "F'", "F2", "R", "R'", "R2"}
+
+    if raw_moves.endswith('<eos>'):
+        raw_moves = raw_moves[:-5].strip().lstrip()
+        with open("output.txt", "a+") as file:
+            file.write(f"raw moves: {raw_moves}\n")
+
+    # Split the raw_moves input into a list of potential moves
+    moves = raw_moves.split()
+
+    # Create a list to store filtered valid moves
+    filtered_moves = []
+
+    # Check each move, add to filtered_moves if valid, otherwise return False
+    for move in moves:
+        if move in valid_moves:
+            filtered_moves.append(move)
+        else:
+            return False  # Return False immediately if an invalid move is found
+
+    return filtered_moves
+
+
 def reward_model_basic(correct_output, model_output):
     possible_rotations = ['R', 'L', 'U', 'D', "R'", "L'", "U'", "D'", "R2", "L2", "U2", "D2"]
     if any(possible_rotation in model_output for possible_rotation in possible_rotations):
@@ -48,26 +73,34 @@ def reward_model_basic(correct_output, model_output):
 
 def reward_function(model_output, optimalSolution):
     optimal_moves = optimalSolution.split(" ")
-    model_response = model_output[find_second_next_move(model_output):].strip()
+    model_response = model_output[find_second_next_move(model_output)+1:].strip()
     with open("output.txt", "a+") as file:
         file.write(f"model response: {model_response}\n")
-    pattern_full = re.compile("^([UDFBLR][2']?\s*)+$")
-    pattern_moves = re.compile("[UDFBLR][2']?")
-    actual_moves = re.findall(pattern_moves, model_response)
+    # pattern_full = re.compile("^([UDFBLR][2']?\s*)+$")
+    # pattern_moves = re.compile("[UDFBLR][2']?")
+    # actual_moves = re.findall(pattern_moves, model_response)
+    actual_moves = filter_valid_moves(model_response)
     with open("output.txt", "a+") as file:
         file.write(f"actual_moves: {actual_moves}\n")
     with open("output.txt", "a+") as file:
         file.write(f"optimal_moves: {optimal_moves}\n")
-    if len(actual_moves) == 0:# or not bool(re.fullmatch(pattern_full, model_response)):
+    if not actual_moves:#len(actual_moves) == 0:# or not bool(re.fullmatch(pattern_full, model_response)):
+        with open("output.txt", "a+") as file:
+            file.write(f"reward: {-100}\n")
         return -100
-    reward = 0
+    reward = 5
     # Iterate over the minimum length of both lists to avoid index errors
+    count = 1
     for actual, optimal in zip(actual_moves, optimal_moves):
         if actual == optimal:
-            reward += 1
+            reward += 5
+            if count == len(optimal_moves):
+                reward *= 10
+            count += 1
         else:
+            with open("output.txt", "a+") as file:
+                file.write(f"number correct: {count-1}\n")
             break  # Stop counting at the first mismatch
-    reward *= 10
     with open("output.txt", "a+") as file:
         file.write(f"reward: {reward}\n")
     return reward
