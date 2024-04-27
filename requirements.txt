@@ -7,5 +7,4 @@ trl
 peft
 bitsandbytes
 pycubescrambler
-rubik_solver
 matplotlib
